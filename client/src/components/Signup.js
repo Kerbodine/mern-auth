@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [logInStatus, setLogInStatus] = useState("false");
 
   const updateFirstName = (e) => {
     setFirstName(e.target.value);
@@ -21,6 +27,24 @@ export default function Signup() {
 
   const updatePassword = (e) => {
     setPassword(e.target.value);
+  };
+
+  const signUp = () => {
+    Axios.post("http://localhost:3001/api/register", {
+      firstName,
+      lastName,
+      email,
+      password,
+    }).then((response) => {
+      if (!response.data.auth) {
+        setLogInStatus(false);
+      } else {
+        console.log(response.data);
+        setLogInStatus(true);
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+      }
+    });
   };
 
   return (
@@ -62,7 +86,9 @@ export default function Signup() {
           required
           className="form-input mt-3"
         />
-        <button className="mt-8 form-button">Sign Up</button>
+        <button className="mt-8 form-button" onClick={signUp}>
+          Sign Up
+        </button>
         <Link className="mt-2 block text-sm text-gray-500" to="/login">
           Already have an account?{" "}
           <span className="hover:underline cursor-pointer">Log in</span>
