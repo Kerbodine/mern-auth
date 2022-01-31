@@ -7,6 +7,9 @@ const getUserRoute = require("./routes/getUser");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const cors = require("cors");
+app.use(cors());
+
 mongoose.connect(process.env.MONGODB_URI, () => {
   console.log("Connected to MongoDB");
 });

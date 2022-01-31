@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [logInStatus, setLogInStatus] = useState("false");
 
   const updateEmail = (e) => {
     setEmail(e.target.value);
@@ -11,6 +17,22 @@ export default function Login() {
 
   const updatePassword = (e) => {
     setPassword(e.target.value);
+  };
+
+  const login = () => {
+    Axios.post("http://localhost:3001/api/login", {
+      email: email,
+      password: password,
+    }).then((response) => {
+      if (!response.data.auth) {
+        setLogInStatus(false);
+      } else {
+        console.log(response.data);
+        setLogInStatus(true);
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+      }
+    });
   };
 
   return (
@@ -34,7 +56,9 @@ export default function Login() {
           required
           className="form-input mt-3"
         />
-        <button className="mt-8 form-button">Log in</button>
+        <button className="mt-8 form-button" onClick={login}>
+          Log in
+        </button>
         <Link className="mt-2 block text-sm text-gray-500" to="/signup">
           Need an account?{" "}
           <span className="hover:underline cursor-pointer">Sign up</span>
